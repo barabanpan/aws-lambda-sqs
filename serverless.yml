@@ -1,5 +1,8 @@
 service: sqs-lambda-example
 
+package:
+  individually: true
+
 custom:
   queueName: doTaskQueue
 
@@ -8,7 +11,7 @@ provider:
   runtime: python3.8
   stage: dev
   region: eu-central-1
-  iamRoleStatements:
+  iam.role.statements:
     - Effect: "Allow"
       Action:
         - "sqs:SendMessage"
@@ -22,12 +25,23 @@ functions:
     environment:
       SQS_URL:
         Ref: SQSQueue
+    package:
+      exclude:
+        - ./**
+      include:
+        - functions/sendMessageSQS.py
+
   doTask:
     handler: functions.doTask.do_task
     events:
       - sqs:
           arn:
             Fn::GetAtt: [ SQSQueue, Arn ]
+    package:  
+      exclude:
+        - ./**
+      include:
+        - functions/doTask.py
 
 resources:
   Resources:
