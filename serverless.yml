@@ -11,17 +11,19 @@ provider:
   runtime: python3.8
   stage: dev
   region: eu-central-1
-  iam.role.statements:
-    - Effect: "Allow"
-      Action:
-        - "sqs:SendMessage"
-      Resource:
-        Fn::GetAtt: [ SQSQueue, Arn ]
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource:
+            Fn::GetAtt: [ SQSQueue, Arn ]
 
 
 functions:
   sensMessageSQS:
-    handler: functions.sendMessageSQS.send
+    handler: functions/sendMessageSQS.send
     environment:
       SQS_URL:
         Ref: SQSQueue
@@ -32,7 +34,7 @@ functions:
         - functions/sendMessageSQS.py
 
   doTask:
-    handler: functions.doTask.do_task
+    handler: functions/doTask.do_task
     events:
       - sqs:
           arn:
